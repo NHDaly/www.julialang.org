@@ -141,6 +141,7 @@ MethodInstance for domath_with_mytype(::Int64)
 
 We can also display this tree as a flame graph, using either the [ProfileView](https://github.com/timholy/ProfileView.jl) or [PProf](https://github.com/JuliaPerf/PProf.jl) packages:
 
+### ProfileView.jl
 ```
 julia> fg = flamegraph(tinf)
 Node(FlameGraphs.NodeData(ROOT() at typeinfer.jl:75, 0x00, 0:10080857))
@@ -175,6 +176,17 @@ We'll see how to deal with these in later installments.
 
 You also see breaks in the flamegraph. During these periods, code generation and runtime create new objects and then call methods on those objects; if one of those calls requires a fresh entrance into inference, that triggers the creation of a new flame.
 Hence, the number of distinct flames (which is just equal to `length(tinf.children)`) gives you a rough indication of how frequently the chains of inference were broken. This can be caused by type instability, separate top-level calls from the REPL during `@snoopi_deep`, calls to `eval` in your code, or some other cause for julia to start running type inference.
+
+### PProf.jl
+```
+julia> fg = flamegraph(tinf)
+Node(FlameGraphs.NodeData(ROOT() at typeinfer.jl:75, 0x00, 0:10080857))
+
+julia> using PProf
+
+julia> pprof(fg)
+```
+
 
 ## Elementary analysis: `flatten` and `accumulate_by_source`
 
